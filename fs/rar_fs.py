@@ -13,16 +13,9 @@ class RarFS(KaitaiSimpleFS):
                 self.add_obj_to_path(block.body.file_name.split('\\'), block)
 
     def get_file_attrs(self, obj):
-        return {
-            'st_atime': 0,
-            'st_ctime': 0,
-            'st_mtime': 0,
-            'st_nlink': 1,
-            'st_mode': 0o100644,
-            'st_size': obj.add_size,
-            'st_gid': 0,
-            'st_uid': 0,
-        }
+        a = super(RarFS, self).get_file_attrs(obj)
+        a['st_size'] = obj.add_size
+        return a
 
     def get_file_body(self, obj, offset, length):
         return obj.add_body[offset:offset + length]
