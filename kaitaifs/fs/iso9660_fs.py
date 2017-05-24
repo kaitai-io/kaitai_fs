@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
 import errno
 from datetime import datetime
-from fuse import FuseOSError
 
-from parser.iso9660 import Iso9660
-from kaitai_tree_fs import KaitaiTreeFS
+from kaitaifs.parser.iso9660 import Iso9660
+from kaitaifs.kaitai_tree_fs import KaitaiTreeFS
+
+from fuse import FuseOSError
 
 
 class Iso9660FS(KaitaiTreeFS):
@@ -20,17 +22,19 @@ class Iso9660FS(KaitaiTreeFS):
     def list_files(self, cur_dir):
         for entry in cur_dir.extent_as_dir.entries:
             entry_body = getattr(entry, "body", None)
-            if entry_body != None:
+            if entry_body is not None:
                 fn = entry_body.file_name
-                if not (fn == u'\x00' or fn == u'\x01'):
+                if fn not in (u'\x00', u'\x01'):
                     yield entry_body.file_name
 
     def get_file_attrs(self, obj):
         # Directory or file?
         if obj.file_flags & 2 != 0:
-            mode = 0o040755 # directory
+            # Directory
+            mode = 0o040755
         else:
-            mode = 0o100644 # regular file
+            # Regular file
+            mode = 0o100644
 
         # Calculate date & time for the file
         dt = obj.datetime
@@ -41,8 +45,8 @@ class Iso9660FS(KaitaiTreeFS):
             dt.hour,
             dt.minute,
             dt.sec,
-            0 # microseconds
-#           tzinfo
+            # Microseconds
+            0
         )
         timestamp = (t - datetime(1970, 1, 1)).total_seconds()
 
@@ -60,11 +64,9 @@ class Iso9660FS(KaitaiTreeFS):
     def get_file_body(self, obj, offset, length):
         return obj.extent_as_file[offset:offset + length]
 
-    # ========================================================================
-
     def find_name_in_dir(self, cur_dir, name):
         for entry in cur_dir.extent_as_dir.entries:
             entry_body = getattr(entry, "body", None)
-            if (entry_body != None) and (entry_body.file_name == name):
+            if entry_body is not None and entry_body.file_name == name:
                 return entry_body
         raise FuseOSError(errno.ENOENT)

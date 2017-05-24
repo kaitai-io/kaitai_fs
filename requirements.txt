@@ -1,3 +1,0 @@
-enum34
-fusepy
-kaitaistruct==0.7
