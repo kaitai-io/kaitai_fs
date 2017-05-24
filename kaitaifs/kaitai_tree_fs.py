@@ -34,8 +34,6 @@ class KaitaiTreeFS(Operations):
     }
 
     def getattr(self, path, fh=None):
-        print "getattr: " + repr(path)
-
         if path == "/":
              return self.ATTR_DIR
 
@@ -72,7 +70,6 @@ class KaitaiTreeFS(Operations):
         return n
 
     def read(self, path, length, offset, fh):
-        print "read(%s, %s, %s, %s)" % (repr(path), repr(length), repr(offset), repr(fh))
         obj = self.openfiles[fh]
         data = self.get_file_body(obj, offset, length)
         return data
