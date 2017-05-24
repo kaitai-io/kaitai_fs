@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import errno
+import itertools
 
 from fuse import FuseOSError, Operations
 
@@ -127,13 +128,13 @@ class KaitaiSimpleFS(Operations):
     }
 
     def getattr(self, path, fh=None):
-        if path == "/":
+        if path == '/':
             return self.ATTR_DIR
 
         tree = self.tree_by_path(path)
         if tree is None:
             raise FuseOSError(errno.ENOENT)
-        elif (len(tree) == 1 and '.' in tree):
+        elif len(tree) == 1 and '.' in tree:
             obj = tree['.']
             return self.get_file_attrs(obj)
         else:
@@ -141,25 +142,8 @@ class KaitaiSimpleFS(Operations):
 
     def readdir(self, path, fh):
         tree = self.tree_by_path(path)
-        for r in ['.', '..']:
+        for r in itertools.chain(('.', '..'), tree):
             yield r
-        for r in tree:
-            if r != '.':
-                yield r
-
-    def statfs(self, path):
-        return {
-            'f_bsize': 4096,
-            'f_frsize': 4096,
-            'f_blocks': 1024 * 1024,
-            'f_bfree': 0,
-            'f_bavail': 1024 * 1024,
-            'f_files': 1024 * 1024,
-            'f_ffree': 1024 * 1024,
-            'f_favail': 1024 * 1024,
-            'f_flag': 4096,
-            'f_namemax': 0xffff,
-        }
 
     def open(self, path, flags):
         block = self.obj_by_path(path)
