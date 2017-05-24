@@ -44,7 +44,8 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(args):
+def main():
+    args = parse_args()
     fs_class = FILESYSTEMS[args.fstype]
     FUSE(
         fs_class(args.image_file),
@@ -53,4 +54,4 @@ def main(args):
         foreground=True
     )
 
-main(parse_args())
+main()
