@@ -1,7 +1,8 @@
-import os
+# -*- coding: utf-8 -*-
 import errno
 
 from fuse import FuseOSError, Operations
+
 
 class KaitaiSimpleFS(Operations):
     """A filesystem that keeps its whole directory tree in memory.
@@ -39,8 +40,6 @@ class KaitaiSimpleFS(Operations):
         self.tree = {}
         self.generate_tree()
 
-    # ========================================================================
-
     def get_file_attrs(self, obj):
         """Get file attributes for a given object.
 
@@ -62,9 +61,7 @@ class KaitaiSimpleFS(Operations):
             'st_size': 4096,
             'st_gid': 0,
             'st_uid': 0,
-        }        
-
-    # ========================================================================
+        }
 
     def add_obj_to_path(self, path, obj):
         t = self.tree
@@ -86,7 +83,13 @@ class KaitaiSimpleFS(Operations):
             any stage.
         """
         if path[0] != '/':
-            raise RuntimeError("Internal error: path is expected to start with /, but got %s" % (repr(path)))
+            raise RuntimeError(
+                'Internal error: path is expected to start with /'
+                ', but got {path!r}'.format(
+                    path=path
+                )
+            )
+
         if path == '/':
             return self.tree
 
@@ -101,16 +104,14 @@ class KaitaiSimpleFS(Operations):
 
     def obj_by_path(self, path):
         obj = self.tree_by_path(path)
-        if obj == None or '.' not in obj:
+        if obj is None or '.' not in obj:
             raise FuseOSError(errno.ENOENT)
         else:
             return obj['.']
 
-    # ========================================================================
-
     def access(self, path, mode):
         tree = self.tree_by_path(path)
-        if tree == None:
+        if tree is None:
             raise FuseOSError(errno.ENOENT)
         return
 
@@ -127,10 +128,10 @@ class KaitaiSimpleFS(Operations):
 
     def getattr(self, path, fh=None):
         if path == "/":
-             return self.ATTR_DIR
+            return self.ATTR_DIR
 
         tree = self.tree_by_path(path)
-        if tree == None:
+        if tree is None:
             raise FuseOSError(errno.ENOENT)
         elif (len(tree) == 1 and '.' in tree):
             obj = tree['.']
@@ -159,8 +160,6 @@ class KaitaiSimpleFS(Operations):
             'f_flag': 4096,
             'f_namemax': 0xffff,
         }
-
-    # ========================================================================
 
     def open(self, path, flags):
         block = self.obj_by_path(path)
