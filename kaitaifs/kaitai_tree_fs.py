@@ -47,20 +47,6 @@ class KaitaiTreeFS(Operations):
         for r in self.list_files(obj):
             yield r
 
-    def statfs(self, path):
-        return {
-            'f_bsize': 4096,
-            'f_frsize': 4096,
-            'f_blocks': 1024 * 1024,
-            'f_bfree': 0,
-            'f_bavail': 1024 * 1024,
-            'f_files': 1024 * 1024,
-            'f_ffree': 1024 * 1024,
-            'f_favail': 1024 * 1024,
-            'f_flag': 4096,
-            'f_namemax': 0xffff,
-        }
-
     def open(self, path, flags):
         obj = self.obj_by_pathstr(path)
         self.openfiles.append(obj)
