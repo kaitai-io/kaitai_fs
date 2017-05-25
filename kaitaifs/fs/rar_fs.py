@@ -1,6 +1,8 @@
-from parser.rar import Rar
+# -*- coding: utf-8 -*-
+from kaitaifs.parser.rar import Rar
 
-from kaitai_simple_fs import KaitaiSimpleFS
+from kaitaifs.kaitai_simple_fs import KaitaiSimpleFS
+
 
 class RarFS(KaitaiSimpleFS):
     def __init__(self, filename):

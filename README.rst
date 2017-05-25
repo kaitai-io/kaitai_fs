@@ -17,7 +17,7 @@ Prerequisites: FUSE (tested on a Linux system, should work on Mac OS X
 as well).
 
 * Clone this repository
-* Run ``pip install -r requirements.txt``
+* Run ``python setup.py install``
 
 How to extend
 -------------

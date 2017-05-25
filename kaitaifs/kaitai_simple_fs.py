@@ -1,7 +1,9 @@
-import os
+# -*- coding: utf-8 -*-
 import errno
+import itertools
 
 from fuse import FuseOSError, Operations
+
 
 class KaitaiSimpleFS(Operations):
     """A filesystem that keeps its whole directory tree in memory.
@@ -39,8 +41,6 @@ class KaitaiSimpleFS(Operations):
         self.tree = {}
         self.generate_tree()
 
-    # ========================================================================
-
     def get_file_attrs(self, obj):
         """Get file attributes for a given object.
 
@@ -62,9 +62,7 @@ class KaitaiSimpleFS(Operations):
             'st_size': 4096,
             'st_gid': 0,
             'st_uid': 0,
-        }        
-
-    # ========================================================================
+        }
 
     def add_obj_to_path(self, path, obj):
         t = self.tree
@@ -86,7 +84,13 @@ class KaitaiSimpleFS(Operations):
             any stage.
         """
         if path[0] != '/':
-            raise RuntimeError("Internal error: path is expected to start with /, but got %s" % (repr(path)))
+            raise RuntimeError(
+                'Internal error: path is expected to start with /'
+                ', but got {path!r}'.format(
+                    path=path
+                )
+            )
+
         if path == '/':
             return self.tree
 
@@ -101,16 +105,14 @@ class KaitaiSimpleFS(Operations):
 
     def obj_by_path(self, path):
         obj = self.tree_by_path(path)
-        if obj == None or '.' not in obj:
+        if obj is None or '.' not in obj:
             raise FuseOSError(errno.ENOENT)
         else:
             return obj['.']
 
-    # ========================================================================
-
     def access(self, path, mode):
         tree = self.tree_by_path(path)
-        if tree == None:
+        if tree is None:
             raise FuseOSError(errno.ENOENT)
         return
 
@@ -126,13 +128,13 @@ class KaitaiSimpleFS(Operations):
     }
 
     def getattr(self, path, fh=None):
-        if path == "/":
-             return self.ATTR_DIR
+        if path == '/':
+            return self.ATTR_DIR
 
         tree = self.tree_by_path(path)
-        if tree == None:
+        if tree is None:
             raise FuseOSError(errno.ENOENT)
-        elif (len(tree) == 1 and '.' in tree):
+        elif len(tree) == 1 and '.' in tree:
             obj = tree['.']
             return self.get_file_attrs(obj)
         else:
@@ -140,27 +142,8 @@ class KaitaiSimpleFS(Operations):
 
     def readdir(self, path, fh):
         tree = self.tree_by_path(path)
-        for r in ['.', '..']:
+        for r in itertools.chain(('.', '..'), tree):
             yield r
-        for r in tree:
-            if r != '.':
-                yield r
-
-    def statfs(self, path):
-        return {
-            'f_bsize': 4096,
-            'f_frsize': 4096,
-            'f_blocks': 1024 * 1024,
-            'f_bfree': 0,
-            'f_bavail': 1024 * 1024,
-            'f_files': 1024 * 1024,
-            'f_ffree': 1024 * 1024,
-            'f_favail': 1024 * 1024,
-            'f_flag': 4096,
-            'f_namemax': 0xffff,
-        }
-
-    # ========================================================================
 
     def open(self, path, flags):
         block = self.obj_by_path(path)
@@ -169,7 +152,6 @@ class KaitaiSimpleFS(Operations):
         return n
 
     def read(self, path, length, offset, fh):
-        print "read(%s, %s, %s, %s)" % (repr(path), repr(length), repr(offset), repr(fh))
         obj = self.openfiles[fh]
         data = self.get_file_body(obj, offset, length)
         return data

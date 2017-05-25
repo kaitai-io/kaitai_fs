@@ -1,27 +1,8 @@
-import os
-import errno
+# -*- coding: utf-8 -*-
+from fuse import Operations
 
-from fuse import FuseOSError, Operations
 
 class KaitaiTreeFS(Operations):
-    def __init__(self):
-        self.openfiles = []
-
-    # ========================================================================
-
-    def obj_by_pathstr(self, pathstr):
-        if pathstr[0] != '/':
-            raise RuntimeError("Internal error: path is expected to start with /, but got %s" % (repr(pathstr)))
-
-        if pathstr == '/':
-            path = []
-        else:
-            path = pathstr[1:].split('/')
-
-        return self.obj_by_path(path)
-
-    # ========================================================================
-
     ATTR_DIR = {
         'st_atime': 0,
         'st_ctime': 0,
@@ -33,11 +14,28 @@ class KaitaiTreeFS(Operations):
         'st_uid': 0,
     }
 
-    def getattr(self, path, fh=None):
-        print "getattr: " + repr(path)
+    def __init__(self):
+        self.openfiles = []
 
+    def obj_by_pathstr(self, pathstr):
+        if pathstr[0] != '/':
+            raise RuntimeError(
+                'Internal error: path is expected to start with /,'
+                'but got {path!r}'.format(
+                    path=pathstr
+                )
+            )
+
+        if pathstr == '/':
+            path = []
+        else:
+            path = pathstr[1:].split('/')
+
+        return self.obj_by_path(path)
+
+    def getattr(self, path, fh=None):
         if path == "/":
-             return self.ATTR_DIR
+            return self.ATTR_DIR
 
         obj = self.obj_by_pathstr(path)
         return self.get_file_attrs(obj)
@@ -63,8 +61,6 @@ class KaitaiTreeFS(Operations):
             'f_namemax': 0xffff,
         }
 
-    # ========================================================================
-    
     def open(self, path, flags):
         obj = self.obj_by_pathstr(path)
         self.openfiles.append(obj)
@@ -72,7 +68,6 @@ class KaitaiTreeFS(Operations):
         return n
 
     def read(self, path, length, offset, fh):
-        print "read(%s, %s, %s, %s)" % (repr(path), repr(length), repr(offset), repr(fh))
         obj = self.openfiles[fh]
         data = self.get_file_body(obj, offset, length)
         return data
