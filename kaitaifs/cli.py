@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 
-from kaitaifs.fs.rar_fs import RarFS
-from kaitaifs.fs.quake_pak_fs import QuakePakFS
-from kaitaifs.fs.heroes_of_might_and_magic_agg_fs import (
+from .fs.rar_fs import RarFS
+from .fs.quake_pak_fs import QuakePakFS
+from .fs.heroes_of_might_and_magic_agg_fs import (
     HeroesOfMightAndMagicAggFS
 )
-from kaitaifs.fs.iso9660_fs import Iso9660FS
+from .fs.iso9660_fs import Iso9660FS
 
 from fuse import FUSE
 
