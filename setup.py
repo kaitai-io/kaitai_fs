@@ -1,22 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-from setuptools import setup, find_packages
+#!/usr/bin/env python3
+import os
+from setuptools import setup
+from setuptools.config import read_configuration
 
+from pathlib import Path
 
-if __name__ == '__main__':
-    setup(
-        name='kaitaifs',
-        version='0.1.0',
-        long_description=__doc__,
-        packages=find_packages(),
-        install_requires=[
-            'enum34',
-            'fusepy',
-            'kaitaistruct==0.7'
-        ],
-        entry_points={
-            'console_scripts': [
-                'kaitaifs=kaitaifs.cli:main'
-            ]
-        }
-    )
+cfg = read_configuration(str(Path(__file__).parent / 'setup.cfg'))
+#print(cfg)
+cfg["options"].update(cfg["metadata"])
+cfg=cfg["options"]
+setup(**cfg)
