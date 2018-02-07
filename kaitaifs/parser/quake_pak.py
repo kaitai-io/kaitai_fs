@@ -1,14 +1,18 @@
+# This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
+
 from pkg_resources import parse_version
 from kaitaistruct import __version__ as ks_version, KaitaiStruct, KaitaiStream, BytesIO
 import struct
-# This is a generated file! Please edit source .ksy file and use kaitai-struct-compiler to rebuild
-
 
 
 if parse_version(ks_version) < parse_version('0.7'):
     raise Exception("Incompatible Kaitai Struct Python API: 0.7 or later is required, but you have %s" % (ks_version))
 
 class QuakePak(KaitaiStruct):
+    """
+    .. seealso::
+       Source - https://quakewiki.org/wiki/.pak#Format_specification
+    """
     def __init__(self, _io, _parent=None, _root=None):
         self._io = _io
         self._parent = _parent
@@ -17,8 +21,8 @@ class QuakePak(KaitaiStruct):
 
     def _read(self):
         self.magic = self._io.ensure_fixed_contents(struct.pack('4b', 80, 65, 67, 75))
-        self.index_ofs = self._io.read_u4le()
-        self.index_size = self._io.read_u4le()
+        self.ofs_index = self._io.read_u4le()
+        self.len_index = self._io.read_u4le()
 
     class IndexStruct(KaitaiStruct):
         def __init__(self, _io, _parent=None, _root=None):
@@ -29,8 +33,10 @@ class QuakePak(KaitaiStruct):
 
         def _read(self):
             self.entries = []
+            i = 0
             while not self._io.is_eof():
                 self.entries.append(self._root.IndexEntry(self._io, self, self._root))
+                i += 1
 
 
 
@@ -65,8 +71,8 @@ class QuakePak(KaitaiStruct):
             return self._m_index if hasattr(self, '_m_index') else None
 
         _pos = self._io.pos()
-        self._io.seek(self.index_ofs)
-        self._raw__m_index = self._io.read_bytes(self.index_size)
+        self._io.seek(self.ofs_index)
+        self._raw__m_index = self._io.read_bytes(self.len_index)
         io = KaitaiStream(BytesIO(self._raw__m_index))
         self._m_index = self._root.IndexStruct(io, self, self._root)
         self._io.seek(_pos)
