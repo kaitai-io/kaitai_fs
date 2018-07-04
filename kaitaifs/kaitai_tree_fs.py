@@ -1,8 +1,28 @@
 # -*- coding: utf-8 -*-
-from fuse import Operations
+from fuse import Operations, LoggingMixIn
+import os
+import sys
 
+import typing
 
-class KaitaiTreeFS(Operations):
+def split_obj_path(pathstr:str) -> typing.Iterable[str]:
+    if pathstr[0] != '/':
+        raise RuntimeError(
+            'Internal error: path is expected to start with /,'
+            'but got {path!r}'.format(
+                path=pathstr
+            )
+        )
+
+    if pathstr == '/':
+        path = []
+    else:
+        path = pathstr[1:].split('/')
+    return path
+
+isWin = sys.platform == "win32"
+
+class KaitaiTreeFS(LoggingMixIn, Operations):
     ATTR_DIR = {
         'st_atime': 0,
         'st_ctime': 0,
@@ -10,28 +30,16 @@ class KaitaiTreeFS(Operations):
         'st_nlink': 1,
         'st_mode': 0o040755,
         'st_size': 4096,
-        'st_gid': 0,
-        'st_uid': 0,
+        'st_gid': os.getgid() if not isWin else 0,
+        'st_uid': os.geteuid() if not isWin else 0,
     }
 
     def __init__(self):
         self.openfiles = []
+        super().__init__()
 
-    def obj_by_pathstr(self, pathstr):
-        if pathstr[0] != '/':
-            raise RuntimeError(
-                'Internal error: path is expected to start with /,'
-                'but got {path!r}'.format(
-                    path=pathstr
-                )
-            )
-
-        if pathstr == '/':
-            path = []
-        else:
-            path = pathstr[1:].split('/')
-
-        return self.obj_by_path(path)
+    def obj_by_pathstr(self, pathstr:str):
+        return self.obj_by_path(split_obj_path(pathstr))
 
     def getattr(self, path, fh=None):
         if path == "/":
