@@ -41,6 +41,14 @@ def parse_args():
         type=str,
         help='mount point'
     )
+    parser.add_argument(
+        "volume_name",
+        metavar="VOLUME_NAME",
+        type=str,
+        help="volume name (osxfuse and winfsp only)",
+        nargs="?",
+        default="Kaitai",
+    )
     return parser.parse_args()
 
 
@@ -51,7 +59,8 @@ def main():
         fs_class(args.image_file),
         args.mount_point,
         nothreads=True,
-        foreground=True
+        foreground=True,
+        volname=args.volume_name
     )
 
 if __name__ == "__main__":
