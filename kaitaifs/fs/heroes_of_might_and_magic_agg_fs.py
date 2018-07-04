@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from kaitaifs.parser.heroes_of_might_and_magic_agg import (
+from ..parser.heroes_of_might_and_magic_agg import (
     HeroesOfMightAndMagicAgg
 )
 
-from kaitaifs.kaitai_simple_fs import KaitaiSimpleFS
+from ..kaitai_simple_fs import KaitaiSimpleFS
 
 
 class HeroesOfMightAndMagicAggFS(KaitaiSimpleFS):
