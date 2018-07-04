@@ -12,7 +12,7 @@ class RarFS(KaitaiSimpleFS):
     def generate_tree(self):
         for block in self.obj.blocks:
             if block.block_type == Rar.BlockTypes.file_header:
-                self.add_obj_to_path(block.body.file_name.split('\\'), block)
+                self.add_obj_to_path(block.body.file_name.decode("utf-8").split('\\'), block)
 
     def get_file_attrs(self, obj):
         a = super(RarFS, self).get_file_attrs(obj)
