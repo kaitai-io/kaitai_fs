@@ -97,3 +97,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Kaitai Struct formats library downloaded by kaitaiStructCompile
+/kaitai_struct_formats

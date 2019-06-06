@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from kaitaifs.parser.quake_pak import QuakePak
-from kaitaifs.kaitai_simple_fs import KaitaiSimpleFS
+from ..parser.quake_pak import QuakePak
+from ..kaitai_simple_fs import KaitaiSimpleFS
 
 
 class QuakePakFS(KaitaiSimpleFS):
