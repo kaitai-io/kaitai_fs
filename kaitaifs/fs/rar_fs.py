@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from kaitaifs.parser.rar import Rar
+from ..parser.rar import Rar
 
-from kaitaifs.kaitai_simple_fs import KaitaiSimpleFS
+from ..kaitai_simple_fs import KaitaiSimpleFS
 
 
 class RarFS(KaitaiSimpleFS):
