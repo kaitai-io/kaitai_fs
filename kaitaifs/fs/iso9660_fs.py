@@ -2,8 +2,8 @@
 import errno
 from datetime import datetime
 
-from kaitaifs.parser.iso9660 import Iso9660
-from kaitaifs.kaitai_tree_fs import KaitaiTreeFS
+from ..parser.iso9660 import Iso9660
+from ..kaitai_tree_fs import KaitaiTreeFS
 
 from fuse import FuseOSError
 
